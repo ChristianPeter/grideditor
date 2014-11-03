@@ -15,23 +15,42 @@
   	
   	
   	$grid.find('td').mousedown(function(event){
-  		isSelectionMode = true;
-		//$(".highlight").removeClass("highlight"); // clear previous selection
-		event.preventDefault(); // this prevents text selection from happening
-		isSelect = !$(this).hasClass('highlight');
-		$(this).toggleClass("highlight");
+  		if (mode === 'L'){
+	  		isSelectionMode = true;
+			//$(".highlight").removeClass("highlight"); // clear previous selection
+			event.preventDefault(); 
+			isSelect = !$(this).hasClass('highlight');
+			$(this).toggleClass("highlight");  			
+  		}
+  		else if (mode ==='E'){
+  			// toggle this, the X+1 and Y+1 neighbors
+  			event.preventDefault(); 
+			isSelect = !$(this).hasClass('highlight');
+			var nodes = [$(this)];
+			nodes.push($(this).next());
+			var $other = $(this).parent().next();
+			$other = $other.find("td[data-col='"+$(this).data('col')+"']");
+			nodes.push($other);
+			$other = $other.next();
+			nodes.push($other);
+			
+			$.each(nodes, function(){
+				isSelect ? $(this).addClass("highlight") : $(this).removeClass("highlight");
+			});
+  		}
 
 	});
 	
-	$grid.find('td').mouseenter(function(event){			
-		if (isSelectionMode) {
-			if (isSelect){
-				$(this).addClass("highlight");
-			}
-			else {
-				$(this).removeClass("highlight");
-			}
-				
+	$grid.find('td').mouseenter(function(event){
+		if (mode === 'L'){
+			if (isSelectionMode) {
+				if (isSelect){
+					$(this).addClass("highlight");
+				}
+				else {
+					$(this).removeClass("highlight");
+				}
+			}					
 
 		}
 	});

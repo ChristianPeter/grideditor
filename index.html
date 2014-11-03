@@ -9,9 +9,15 @@
 
   <body>
     <h1>Grid Editor</h1>
+    <select id="mode-selector">
+    	<option value="0">Element</option>
+    	<option value="1">Line</option>
+    </select>
+    <button id="btn1">Optimize!</button>
     <div class="debug">Debug</div>
     <div id="grid"></div>
     
+    <button>Button<h1>Button</h1></button>
     <script>
     	$(document).ready(function(){
     		$('#grid').grideditor();
