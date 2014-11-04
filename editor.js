@@ -8,24 +8,23 @@
   var isSelectionMode = false;
   var isSelect = true;
   
-  var mode = 'E'; // E for Element L for Line
+  var mode = 'S'; // E for Element L for Line S for Selection
   $.fn.grideditor = function(options){
   	$grid = $(this);
   	initGrid();
   	
   	
   	$grid.find('td').mousedown(function(event){
-  		if (mode === 'L'){
+  		event.preventDefault();
+  		if (mode === 'S'){
+  			$grid.find('td').removeClass('selection');
 	  		isSelectionMode = true;
-			//$(".highlight").removeClass("highlight"); // clear previous selection
-			event.preventDefault(); 
-			isSelect = !$(this).hasClass('highlight');
-			$(this).toggleClass("highlight");  			
+			isSelect = true;
+			$(this).toggleClass("selection");  			
   		}
   		else if (mode ==='E'){
   			// toggle this, the X+1 and Y+1 neighbors
-  			event.preventDefault(); 
-			isSelect = !$(this).hasClass('highlight');
+			isSelect = !$(this).hasClass('draw-element');
 			var nodes = [$(this)];
 			nodes.push($(this).next());
 			var $other = $(this).parent().next();
@@ -35,20 +34,26 @@
 			nodes.push($other);
 			
 			$.each(nodes, function(){
-				isSelect ? $(this).addClass("highlight") : $(this).removeClass("highlight");
+				isSelect ? $(this).addClass("draw-element") : $(this).removeClass("highlight");
 			});
+  		}
+  		else if (mode === 'L'){
+  			// TODO: currently just a backup
+  			isSelectionMode = true;
+			isSelect = !$(this).hasClass('selection');
+			$(this).toggleClass("selection");  	
   		}
 
 	});
 	
 	$grid.find('td').mouseenter(function(event){
-		if (mode === 'L'){
+		if (mode === 'S'){
 			if (isSelectionMode) {
 				if (isSelect){
-					$(this).addClass("highlight");
+					$(this).addClass("selection");
 				}
 				else {
-					$(this).removeClass("highlight");
+					$(this).removeClass("selection");
 				}
 			}					
 
@@ -57,6 +62,11 @@
 	
 	$(document).mouseup(function(ev) {
 		isSelectionMode = false;
+	});
+	
+	$("input:radio[name=tool]").click(function() {
+	    var value = $(this).val();
+	    mode = value;
 	});
   };
   

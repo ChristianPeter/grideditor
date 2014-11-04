@@ -1,8 +1,6 @@
 /* Styles go here */
 
-.highlight{
-	background-color: #48c;
-}
+
 table.grid-table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -14,6 +12,8 @@ table.grid-table tr{
 table.grid-table td{
   min-width: 40px;
   padding: 0px;
+  border: 1px solid white;
+  background-color: #ccc;
 }
 
 table.grid-table td > div {
@@ -142,4 +142,20 @@ table.grid-table .txt{
   display: inline-block;
   vertical-align: top;
   margin-left: 10px;
+}
+
+
+
+table.grid-table td.highlight{
+	background-color: #48c;
+}
+table.grid-table td.selection{
+	background-color: yellow;
+}
+table.grid-table td.draw-element{
+	background-color: #6c6;
+}
+
+table.grid-table td.draw-element.selection{
+	background-color: #c66;
 }
