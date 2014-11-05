@@ -148,6 +148,7 @@ table.grid-table .txt{
 
 table.grid-table td.highlight{
 	background-color: #48c;
+	border: 5px solid red;
 }
 table.grid-table td.selection{
 	background-color: yellow;

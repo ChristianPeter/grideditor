@@ -7,51 +7,56 @@
   };
   var isSelectionMode = false;
   var isSelect = true;
+  var elementCount = 0;
   
   var mode = 'S'; // E for Element L for Line S for Selection
   $.fn.grideditor = function(options){
   	$grid = $(this);
   	initGrid();
   	initEvents();
-  	
-  	  };
+  };
   
-  function updateGrid(){
-  	$grid.find('tr').remove();
-  	initGridContent($grid.children('table:first'));
-  	initElements(model.elements);
-  	/*
-  	$grid.find('td').removeClass('draw-element');//.html('');
-  	$.each(model.elements, function(){
-  		var $cell = $grid.find("tr[data-row="+this.y+"] > td[data-col="+this.x+"]");
-		$cell.html(this.data);
-		$cell.addClass('draw-element');
-  	});
-  	*/
-}
+  	function updateGrid(){
+	  	$grid.find('tr').remove();
+	  	initGridContent($grid.children('table:first'));
+	  	initElements(model.elements);
+	  	/*
+	  	$grid.find('td').removeClass('draw-element');//.html('');
+	  	$.each(model.elements, function(){
+	  		var $cell = $grid.find("tr[data-row="+this.y+"] > td[data-col="+this.x+"]");
+			$cell.html(this.data);
+			$cell.addClass('draw-element');
+	  	});
+	  	*/
+	}
   
   
-  function initElements(elts){
+  	function initElements(elts){
 		 // add elts
 		  $.each(elts, function(){
 		    //alert(this.x);
-		    var $cell = $grid.find("tr[data-row="+this.y+"] > td[data-col="+this.x+"]");
-		    $cell.html(this.data);
-		    $cell.attr('colspan',this.w).attr('rowspan',this.h);
-		    $cell.addClass('node');
-		    
-		    // add detail data:
-		    $cell.data('detail', this.detail);
-		    $cell.data('detailHeader', this.detailHeader);
-		    // find neighbours and kill em
-		    $cell.next().remove();
-		    var neigh = $cell.parent().next().find("td[data-col="+this.x+"]"); //;.remove().next().remove();
-		    var nn = neigh.next();//neigh.remove();
-		    neigh.remove();
-		    nn.remove();
+		    	drawElement(this);
 		    
 		  });
 	}
+  	function drawElement(elt){
+  			var $cell = $grid.find("tr[data-row="+elt.y+"] > td[data-col="+elt.x+"]");
+		    $cell.html(elt.data);
+		    $cell.attr('colspan',elt.w).attr('rowspan',elt.h);
+		    $cell.addClass('node');
+		    
+		    // add detail data:
+		    $cell.data('detail', elt.detail);
+		    $cell.data('detailHeader', elt.detailHeader);
+		    $cell.data('id', elt.id);
+		    // find neighbours and kill em
+		    $cell.next().remove();
+		    var neigh = $cell.parent().next().find("td[data-col="+elt.x+"]"); //;.remove().next().remove();
+		    var nn = neigh.next();//neigh.remove();
+		    neigh.remove();
+		    nn.remove();
+  	
+  }
   function processNodeClick(node){
   	
   }
@@ -63,12 +68,20 @@
   				detailHeader : "header"};
   	elt.x = that.data('col');
 	elt.y = that.data('row');
+	elt.id = elementCount++;
 	if (checkArea(elt)){
-		model.elements.push(elt);		
+		model.elements.push(elt);
+		return elt;
 	}
 	else {
 		//alert('collsion detected');
 	}
+  }
+  
+  function handleSelectNode(that){
+  	$grid.find('td').removeClass('highlight');
+  	that.addClass('highlight');
+  	$('#debug').text('Selected: ' + that.data('id'));
   }
   
   function checkArea(elt){
@@ -103,6 +116,11 @@
 		initGridContent($table);
 	}
 	function initEvents(){
+		$grid.on('mousedown', 'td.node', function(event){
+			if (mode === 'S'){
+				handleSelectNode($(this));
+			}
+		});
 		$grid.on('mousedown', 'td:not(.node)', function(event){
 		event.preventDefault();
   		if (mode === 'S'){
@@ -113,8 +131,9 @@
   		}
   		else if (mode ==='E'){
   			// toggle this, the X+1 and Y+1 neighbors  			
-			handleNewElement($(this));
-			updateGrid();
+			var newElt = handleNewElement($(this));
+			drawElement(newElt);
+			//updateGrid();
 			/*
 			isSelect = !$(this).hasClass('draw-element');
 			var nodes = [$(this)];
@@ -160,6 +179,10 @@
 	$("input:radio[name=tool]").click(function() {
 	    var value = $(this).val();
 	    mode = value;
+	});
+	
+	$('#btn1').on('click', function(){
+		$('#debug').text(JSON.stringify(model));
 	});
 
 	}
