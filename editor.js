@@ -139,7 +139,7 @@
   	});
   
 	
-	$grid.find('td').mouseenter(function(event){
+	$grid.on('mouseenter', 'td:not(.node)', function(event){
 		if (mode === 'S'){
 			if (isSelectionMode) {
 				if (isSelect){
