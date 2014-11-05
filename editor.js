@@ -13,9 +13,8 @@
   	$grid = $(this);
   	initGrid();
   	
-  	
-  	$grid.find('td').mousedown(function(event){
-  		event.preventDefault();
+  	$grid.on('mousedown', 'td:not(.node)', function(event){
+		event.preventDefault();
   		if (mode === 'S'){
   			$grid.find('td').removeClass('selection');
 	  		isSelectionMode = true;
@@ -24,6 +23,13 @@
   		}
   		else if (mode ==='E'){
   			// toggle this, the X+1 and Y+1 neighbors
+  			var elt = { w:2, h:2, data:"new", detail: "detail", detailHeader : "header"};
+  			elt.x = $(this).data('col');
+			elt.y = $(this).data('row');
+			
+			model.elements.push(elt);
+			updateGrid();
+			/*
 			isSelect = !$(this).hasClass('draw-element');
 			var nodes = [$(this)];
 			nodes.push($(this).next());
@@ -34,8 +40,9 @@
 			nodes.push($other);
 			
 			$.each(nodes, function(){
-				isSelect ? $(this).addClass("draw-element") : $(this).removeClass("highlight");
+				isSelect ? $(this).addClass("draw-element") : $(this).removeClass("draw-element");
 			});
+			*/
   		}
   		else if (mode === 'L'){
   			// TODO: currently just a backup
@@ -43,8 +50,8 @@
 			isSelect = !$(this).hasClass('selection');
 			$(this).toggleClass("selection");  	
   		}
-
-	});
+  	});
+  
 	
 	$grid.find('td').mouseenter(function(event){
 		if (mode === 'S'){
@@ -70,24 +77,65 @@
 	});
   };
   
+  function updateGrid(){
+  	$grid.find('tr').remove();
+  	initGridContent($grid.children('table:first'));
+  	initElements(model.elements);
+  	/*
+  	$grid.find('td').removeClass('draw-element');//.html('');
+  	$.each(model.elements, function(){
+  		var $cell = $grid.find("tr[data-row="+this.y+"] > td[data-col="+this.x+"]");
+		$cell.html(this.data);
+		$cell.addClass('draw-element');
+  	});
+  	*/
+}
+  
+  
+  function initElements(elts){
+		 // add elts
+		  $.each(elts, function(){
+		    //alert(this.x);
+		    var $cell = $grid.find("tr[data-row="+this.y+"] > td[data-col="+this.x+"]");
+		    $cell.html(this.data);
+		    $cell.attr('colspan',this.w).attr('rowspan',this.h);
+		    $cell.addClass('node');
+		    
+		    // add detail data:
+		    $cell.data('detail', this.detail);
+		    $cell.data('detailHeader', this.detailHeader);
+		    // find neighbours and kill em
+		    $cell.next().remove();
+		    var neigh = $cell.parent().next().find("td[data-col="+this.x+"]"); //;.remove().next().remove();
+		    var nn = neigh.next();//neigh.remove();
+		    neigh.remove();
+		    nn.remove();
+		    
+		  });
+	}
   function processNodeClick(node){
   	
   }
   
-  function initGrid(){
-		var table = "<table class='grid-table'>";  		
-		for (var y = 0; y < 24; y++){
-		    table += "<tr data-row='"+ y + "'>";
+  function initGridContent($table){
+  			for (var y = 0; y < 24; y++){
+		    table = "<tr data-row='"+ y + "'>";
 		    for (var x = 0; x < 24; x++){
 		      table += "<td data-col='" + x + "' data-row='"+ y + "'>";
 		      table += "X";
 		      table += "</td>";
 		    }
 		    table += "</tr>";
-		    
+		    $table.append($(table));
 		}		  
+  }
+  function initGrid(){
+		var table = "<table class='grid-table'>";  		
 		table += "</table>";		  
-  		$grid.html(table);		
+  		var $table = $(table);
+  		$grid.append($table);		
+
+		initGridContent($table);
 	}
 
 })(jQuery, window, document);
